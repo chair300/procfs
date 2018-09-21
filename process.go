@@ -84,15 +84,8 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 
 	if process.Exe, err = readLink(prefix, "exe"); err != nil {
 		process.Exe = ""
-	}
-	if process.Cmd, err = string(ioutil.ReadFile(path.Join(prefix, "comm")); err != nil {
-		return nil, err
-	}
-
-	if process.Cwd, err = readLink(prefix, "cwd"); err != nil {
-		return nil, err
-	}
-
+  }
+	
 	if process.Root, err = readLink(prefix, "root"); err != nil {
 		return nil, err
 	}
