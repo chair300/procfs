@@ -44,6 +44,7 @@ type Process struct {
 	Cmdline   []string          // Command line of process (argv array)
 	Cwd       string            // Process current working directory
 	Exe       string            // Symlink to executed command.
+	Cmd		string		   // executed command run without path
 	Root      string            // Per-process root (e.g. chroot)
 	prefix    string            // directory path, e.g. /proc/<pid>
 	stat      *stat.Stat        // Status information from /proc/pid/stat - see Stat()
@@ -84,6 +85,9 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 	if process.Exe, err = readLink(prefix, "exe"); err != nil {
 		process.Exe = ""
 	}
+	if process.Cmd, err = ioutil.ReadFile(path.Join(prefix, "comm")); err != nil {
+		return nil, err
+	}
 
 	if process.Cwd, err = readLink(prefix, "cwd"); err != nil {
 		return nil, err
@@ -103,6 +107,10 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 		process.Limits()
 		process.Loginuid()
 		process.Sessionid()
+	}
+	str, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
 	}
 
 	return process, nil
