@@ -1,7 +1,7 @@
 package stat
 
 import (
-	"github.com/jandre/procfs/util"
+	"github.com/chair300/procfs/util"
 	"testing"
 )
 

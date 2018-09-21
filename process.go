@@ -1,6 +1,6 @@
 package procfs
 
-// Copyright Jen Andre (jandre@gmail.com)
+// Copyright Jen Andre (chair300@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -29,10 +29,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jandre/procfs/limits"
-	"github.com/jandre/procfs/stat"
-	"github.com/jandre/procfs/statm"
-	"github.com/jandre/procfs/status"
+	"github.com/chair300/procfs/limits"
+	"github.com/chair300/procfs/stat"
+	"github.com/chair300/procfs/statm"
+	"github.com/chair300/procfs/status"
 )
 
 //
@@ -85,13 +85,20 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 	if process.Exe, err = readLink(prefix, "exe"); err != nil {
 		process.Exe = ""
   }
-	
+
+	if process.Cwd, err = readLink(prefix, "cwd"); err != nil {
+		return nil, err
+	}
+
 	if process.Root, err = readLink(prefix, "root"); err != nil {
 		return nil, err
 	}
 
-	process.readEnviron()
+	if process.Cmd, err = readCmd(prefix); err != nil {
+		return nil, err
+	}
 
+	process.readEnviron()
 
 	if !lazy {
 		// preload all of the subdirs
@@ -102,11 +109,6 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 		process.Loginuid()
 		process.Sessionid()
 	}
-	str, err := ioutil.ReadFile(path.Join(prefix, "comm"))
-	if err != nil {
-		return nil, err
-	}
-	process.Cmd = string(str);
 
 	return process, nil
 }
@@ -165,6 +167,19 @@ func readCmdLine(prefix string) ([]string, error) {
 	}
 	return clearEmpty(strings.Split(string(str), "\x00")), nil
 }
+
+//
+// Read a /proc/<pid>/comm file and break up into array
+// of argv
+//
+func readCmd(prefix string) (string, error) {
+	str, err := ioutil.ReadFile(path.Join(prefix, "comm"))
+	if err != nil {
+		return "", err
+	}
+	return string(str), nil
+}
+
 
 //
 // Parser for /proc/<pid>/stat

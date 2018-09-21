@@ -6,14 +6,14 @@ Not all /proc interfaces are currently supported; but pull requests are welcome!
 
 ## Installation
 
-go get github.com/jandre/procfs 
+go get github.com/chair300/procfs
 
 ## Examples
 See the `*_test` files for usage, but in short:
 
 ```go
 import (
-  "github.com/jandre/procfs"
+  "github.com/chair300/procfs"
 )
 
 // fetch all processes from /proc
@@ -24,4 +24,4 @@ processes, err := procfs.Processes();
 
 ## Documentation
 
-Documentation can be found at: http://godoc.org/github.com/jandre/procfs
+Documentation can be found at: http://godoc.org/github.com/chair300/procfs

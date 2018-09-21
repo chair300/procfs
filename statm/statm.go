@@ -7,7 +7,7 @@
 package statm
 
 //
-// Copyright Jen Andre (jandre@gmail.com)
+// Copyright Jen Andre (chair300@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -30,7 +30,7 @@ package statm
 //
 
 import (
-	"github.com/jandre/procfs/util"
+	"github.com/chair300/procfs/util"
 	"io/ioutil"
 	"strings"
 )

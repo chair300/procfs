@@ -3,7 +3,7 @@ package status
 import (
 	"testing"
 
-	"github.com/jandre/procfs/util"
+	"github.com/chair300/procfs/util"
 )
 
 func TestParsingStatus(t *testing.T) {
