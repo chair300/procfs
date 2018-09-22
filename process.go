@@ -177,7 +177,7 @@ func readCmd(prefix string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(str), nil
+	return clearEmpty(string(str)), nil
 }
 
 
