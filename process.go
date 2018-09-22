@@ -177,7 +177,7 @@ func readCmd(prefix string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return clearEmpty(string(str)), nil
+	return strings.TrimSpace(string(str)), nil
 }
 
 
