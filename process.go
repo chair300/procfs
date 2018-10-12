@@ -289,3 +289,15 @@ func (p *Process) readEnviron() {
 		}
 	}
 }
+ func (p *Process) findChildren(){
+ 	p.Children = make(map[int32]int32,0)
+ 	pids, err := ioutil.ReadFile(path.Join(path.Join(path.Join(p.prefix,"task"),p.Pid),"children"))
+ 	if err != nil {
+		return
+	}
+	cpids := strings.TrimSpace(pids)
+	listpids := strings.Fields(cpids)
+	for _, item = range listpids{
+		p.Children[strconv.Atoi(item)] = strconv.Atoi(item)
+	}
+}

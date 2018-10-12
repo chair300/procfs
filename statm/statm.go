@@ -47,7 +47,37 @@ type Statm struct {
 	Drs      int   //number of pages of data/stack(including libs; broken, includes library text)
 	Dt       int   //number of dirty pages(always 0 on 2.6)
 }
-
+var Desc  = map[string]label{struct {
+	"Size"	: label{
+          		unit: int64,
+				description:  "total program size (pages)(same as VmSize in status)",
+			},
+	"Resident": label{
+          		unit: int64,
+				description:  "size of memory portions (pages)(same as VmRSS in status)",
+			},
+	"Shared" : label{
+          		unit: int,
+				description:  "number of pages that are shared(i.e. backed by a file)",
+			},
+	"Trs"    : label{
+          		unit: int,
+				description:  "number of pages that are 'code'(not including libs; broken, includes data segment)",
+			},
+	"Lrs"    : label{
+          		unit: int,
+				description:  "number of pages of library(always 0 on 2.6)",
+			},
+	"Drs"    : label{
+          		unit: int,
+				description:  "number of pages of data/stack(including libs; broken, includes library text)",
+			},
+	"Dt"     : label{
+          		unit: int,
+				description:  "number of dirty pages(always 0 on 2.6)",
+			},
+		}
+	}
 func New(path string) (*Statm, error) {
 
 	buf, err := ioutil.ReadFile(path)
