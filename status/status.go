@@ -33,50 +33,50 @@ type Status struct {
 	Vcswitch  int64 //voluntary context switches
 	NVcswitch int64 //nonvoluntary context switches
 }
+//
+// var Desciption  = map[string]label{
+// 	"Uid"  : label{
+//           		unit: int,
+// 				description:  "Real user ID",
+// 			},
+// 	"Euid"  : label{
+//           		unit: int,
+// 				description:  " Effective user ID",
+// 			},
+// 	"Suid"  : label{
+//           		unit: int,
+// 				description:  "Saved usesr ID",
+// 			},
+// 	"Fsuid"  : label{
+//           		unit: int,
+// 				description:  "FS user ID",
+// 			},
+// 	"Gid"  : label{
+//           		unit: int,
+// 				description:  "Real group IDusesr",
+// 			},
+// 	"Egid"  : label{
+//           		unit: int,
+// 				description:  "Effective group ID",
+// 			},
+// 	"Sgid"  : label{
+//           		unit: int,
+// 				description:  "Saved group ItrealvalueD",
+// 			},
+// 	"Fsgid"  : label{
+//           		unit: int,
+// 				description:  "FS group ID",
+// 			},
+// 	"Vcswitch"  : label{
+//           		unit: int64,
+// 				description:  "voluntary context switches",
+// 			},
+// 	"NVcswitch" : label{
+//           		unit: int64,
+// 				description:  "nonvoluntary context switches",
+// 			},
+// 		}
 
-var Status_desc  = map[string]label{struct {
-	"Uid"  : label{
-          		unit: int,
-				description:  "Real user ID",
-			},
-	"Euid"  : label{
-          		unit: int,
-				description:  " Effective user ID",
-			},
-	"Suid"  : label{
-          		unit: int,
-				description:  "Saved usesr ID",
-			},
-	"Fsuid"  : label{
-          		unit: int,
-				description:  "FS user ID",
-			},
-	"Gid"  : label{
-          		unit: int,
-				description:  "Real group IDusesr",
-			},
-	"Egid"  : label{
-          		unit: int,
-				description:  "Effective group ID",
-			},
-	"Sgid"  : label{
-          		unit: int,
-				description:  "Saved group ItrealvalueD",
-			},
-	"Fsgid"  : label{
-          		unit: int,
-				description:  "FS group ID",
-			},
-	"Vcswitch"  : label{
-          		unit: int64,
-				description:  "voluntary context switches",
-			},
-	"NVcswitch" : label{
-          		unit: int64,
-				description:  "nonvoluntary context switches",
-			},
-		}
-}
 
 //
 // status.New creates a new /proc/<pid>/status from a path.

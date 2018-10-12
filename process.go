@@ -28,7 +28,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-
 	"github.com/chair300/procfs/limits"
 	"github.com/chair300/procfs/stat"
 	"github.com/chair300/procfs/statm"
@@ -53,6 +52,7 @@ type Process struct {
 	limits    *limits.Limits    // Per process rlimit settings from /proc/pid/limits - see Limits()
 	loginuid  *int              // Maybe loginuid from /proc/pid/loginuid - see Loginuid()
 	sessionid *int              // Maybe sessionid from /proc/pid/sessionid- see Sessionid()
+	Children  chan *Process
 
 }
 
@@ -109,7 +109,7 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 		process.Loginuid()
 		process.Sessionid()
 	}
-
+	process.findChildren()
 	return process, nil
 }
 
@@ -290,14 +290,36 @@ func (p *Process) readEnviron() {
 	}
 }
  func (p *Process) findChildren(){
- 	p.Children = make(map[int32]int32,0)
- 	pids, err := ioutil.ReadFile(path.Join(path.Join(path.Join(p.prefix,"task"),p.Pid),"children"))
+// 	p.Children = make(map[int32]*Process)
+	p.Children = make(chan *Process)
+ 	buf, err := ioutil.ReadFile(path.Join(p.prefix,"task",strconv.Itoa(p.Pid),"children"))
  	if err != nil {
 		return
 	}
-	cpids := strings.TrimSpace(pids)
-	listpids := strings.Fields(cpids)
-	for _, item = range listpids{
-		p.Children[strconv.Atoi(item)] = strconv.Atoi(item)
+
+	fetch := func(pid int) {
+		if err != nil {
+			return
+		}
+		proc, err := NewProcess(pid, false)
+		if err != nil {
+			// TODO: bubble errors up if requested
+			log.Println("Failure loading process pid: ", pid, err)
+			p.Children <- nil
+		} else {
+			p.Children <- proc
+		}
 	}
+	cpids := strings.Split(string(buf), " ")
+
+	for i := 0; i < len(cpids)-1; i++ {
+		id, err := strconv.Atoi(cpids[i])
+	 	if err != nil {
+	 		return
+	 	}
+		log.Println("PPid: ",p.Pid)
+	 	log.Println("Child pid of: ",id)
+		go fetch(id)
+	 }
+
 }

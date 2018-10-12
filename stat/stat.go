@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"strings"
 	"time"
-
 	"github.com/chair300/procfs/util"
 )
 
@@ -61,177 +60,179 @@ type Stat struct {
 	Policy              int64         // scheduling policy (man sched_setscheduler)
 	DelayacctBlkioTicks int64         // time spent waiting for block IO
 }
-var Desc  = map[string]label{struct {
-	"Pid"  	: label{
-          		unit: int,
-				description:  " process id",
-			},
-	"Comm" 	: label{
-          		unit: string,
-				description:  "filename of the executable",
-			},
-	"State" 	: label{
-          		unit: string,
-				description:  "state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)",
-			},
-	"Ppid"    : label{
-          		unit: int,
-				description:  "process id of the parent process",
-			},
-	"Pgrp"    : label{
-          		unit: int,
-				description:  "pgrp of the process",
-			},
-	"Session" : label{
-          		unit: int,
-				description:  "session id",
-			},
-	"TtyNr"  : label{
-          		unit: int,
-				description:  "tty the process uses",
-			},
-	"Tpgid"  : label{
-          		unit: int,
-				description:  "pgrp of the tty",
-			},
-	"Flags"   : label{
-          		unit: int64,
-				description:  "task flags",
-			},
-	"Minflt"  : label{
-          		unit: int64,
-				description:  "number of minor faults",
-			},
-	"Cminflt" : label{
-          		unit: int64,
-				description:  "number of minor faults with child's",
-			},
-	"Majflt"  : label{
-          		unit: int64,
-				description:  "number of major faults",
-			},
-	"Cmajflt" : label{
-          		unit: int64,
-				description:  "number of major faults with child's",
-			},
-	"Utime"   : label{
-          		unit: time.Duration,
-				description:  "user mode in nanoseconds",
-			},
-	"Stime"   : label{
-          		unit:time.Duration,
-				description:  "kernel mode in nanoseconds",
-			},
-	"Cutime"  : label{
-          		unit:  time.Duration ,
-				description:  "user mode in nanoseconds with child's",
-			},
-	"Cstime"  : label{
-          		unit: time.Duration ,
-				description:  "kernel mode in nanoseconds with child's",
-			},
-	"Priority": label{
-          		unit: int64,
-				description:  "priority level",
-			},
-	"Nice"    : label{
-          		unit: int64,
-				description:  "nice level",
-			},
-	"NumThreads" : label{
-          		unit: int64,
-				description:  "number of threads",
-			},
-	"Itrealvalue": label{
-          		unit: int64,
-				description:  "(obsolete, always 0)",
-			},
-	"Starttime"  : label{
-          		unit: int64,
-				description:  "time the process started after system boot",
-			},
-	"Vsize"  : label{
-          		unit: int64,
-				description:  "virtual memory size",
-			},
-	"Rss"    : label{
-          		unit: int64,
-				description:  "resident set memory size",
-			},
-	"Rlim"   : label{
-          		unit: int64,
-				description:  "current limit in bytes on the rss",
-			},
-	"Startcode" : label{
-          		unit: int64,
-				description:  "address above which program text can run",
-			},
-	"Endcode"  : label{
-          		unit: int64,
-				description:  "address below which program text can run",
-			},
-	"Startstack": label{
-          		unit: int64,
-				description:  "address of the start of the main process stack",
-			},
-	"Kstkesp"  : label{
-          		unit: int64,
-				description:  "current value of ESP",
-			},
-	"Kstkeip"  : label{
-          		unit: int64,
-				description:  "current value of EIP",
-			},
-	"Signal"   : label{
-          		unit: int64,
-				description:  "bitmap of pending signals",
-			},
-	"Blocked"  : label{
-          		unit: int64,
-				description:  " bitmap of blocked signals",
-			},
-	"Sigignore" : label{
-          		unit: int64,
-				description:  "bitmap of ignored signals",
-			},
-	"Sigcatch"  : label{
-          		unit: int64,
-				description:  "bitmap of catched signals",
-			},
-	"Wchan"  : label{
-          		unit: int64,
-				description:  "address where process went to sleep)",
-			},
-	"Nswap"  : label{
-          		unit: int64,
-				description:  "(place holder)",
-			},
-	"Cnswap"  : label{
-          		unit: int64,
-				description:  "(place holder)",
-			},
-	"ExitSignal"  : label{
-          		unit: int,
-				description:  "signal to send to parent thread on exit",
-			},
-	"Processor" : label{
-          		unit: int,
-				description:  " which CPU the task is scheduled on",
-			},
-	"RtPriority" : label{
-          		unit: int64,
-				description:  "realtime priority",
-			},
-	"Policy" : label{
-          		unit: int64,
-				description:  "scheduling policy (man sched_setscheduler)",
-			},
-	"DelayacctBlkioTicks": label{
-          		unit: int64,
-				description:  "time spent waiting for block IO",
-			},
-	}
-}
+//
+//
+// var Desc  = map[string]label{
+// 	"Pid"  	: label{
+//           		unit: int,
+// 				description:  " process id",
+// 			},
+// 	"Comm" 	: label{
+//           		unit: string,
+// 				description:  "filename of the executable",
+// 			},
+// 	"State" 	: label{
+//           		unit: string,
+// 				description:  "state (R is running, S is sleeping, D is sleeping in an uninterruptible wait, Z is zombie, T is traced or stopped)",
+// 			},
+// 	"Ppid"    : label{
+//           		unit: int,
+// 				description:  "process id of the parent process",
+// 			},
+// 	"Pgrp"    : label{
+//           		unit: int,
+// 				description:  "pgrp of the process",
+// 			},
+// 	"Session" : label{
+//           		unit: int,
+// 				description:  "session id",
+// 			},
+// 	"TtyNr"  : label{
+//           		unit: int,
+// 				description:  "tty the process uses",
+// 			},
+// 	"Tpgid"  : label{
+//           		unit: int,
+// 				description:  "pgrp of the tty",
+// 			},
+// 	"Flags"   : label{
+//           		unit: int64,
+// 				description:  "task flags",
+// 			},
+// 	"Minflt"  : label{
+//           		unit: int64,
+// 				description:  "number of minor faults",
+// 			},
+// 	"Cminflt" : label{
+//           		unit: int64,
+// 				description:  "number of minor faults with child's",
+// 			},
+// 	"Majflt"  : label{
+//           		unit: int64,
+// 				description:  "number of major faults",
+// 			},
+// 	"Cmajflt" : label{
+//           		unit: int64,
+// 				description:  "number of major faults with child's",
+// 			},
+// 	"Utime"   : label{
+//           		unit: time.Duration,
+// 				description:  "user mode in nanoseconds",
+// 			},
+// 	"Stime"   : label{
+//           		unit:time.Duration,
+// 				description:  "kernel mode in nanoseconds",
+// 			},
+// 	"Cutime"  : label{
+//           		unit:  time.Duration ,
+// 				description:  "user mode in nanoseconds with child's",
+// 			},
+// 	"Cstime"  : label{
+//           		unit: time.Duration ,
+// 				description:  "kernel mode in nanoseconds with child's",
+// 			},
+// 	"Priority": label{
+//           		unit: int64,
+// 				description:  "priority level",
+// 			},
+// 	"Nice"    : label{
+//           		unit: int64,
+// 				description:  "nice level",
+// 			},
+// 	"NumThreads" : label{
+//           		unit: int64,
+// 				description:  "number of threads",
+// 			},
+// 	"Itrealvalue": label{
+//           		unit: int64,
+// 				description:  "(obsolete, always 0)",
+// 			},
+// 	"Starttime"  : label{
+//           		unit: int64,
+// 				description:  "time the process started after system boot",
+// 			},
+// 	"Vsize"  : label{
+//           		unit: int64,
+// 				description:  "virtual memory size",
+// 			},
+// 	"Rss"    : label{
+//           		unit: int64,
+// 				description:  "resident set memory size",
+// 			},
+// 	"Rlim"   : label{
+//           		unit: int64,
+// 				description:  "current limit in bytes on the rss",
+// 			},
+// 	"Startcode" : label{
+//           		unit: int64,
+// 				description:  "address above which program text can run",
+// 			},
+// 	"Endcode"  : label{
+//           		unit: int64,
+// 				description:  "address below which program text can run",
+// 			},
+// 	"Startstack": label{
+//           		unit: int64,
+// 				description:  "address of the start of the main process stack",
+// 			},
+// 	"Kstkesp"  : label{
+//           		unit: int64,
+// 				description:  "current value of ESP",
+// 			},
+// 	"Kstkeip"  : label{
+//           		unit: int64,
+// 				description:  "current value of EIP",
+// 			},
+// 	"Signal"   : label{
+//           		unit: int64,
+// 				description:  "bitmap of pending signals",
+// 			},
+// 	"Blocked"  : label{
+//           		unit: int64,
+// 				description:  " bitmap of blocked signals",
+// 			},
+// 	"Sigignore" : label{
+//           		unit: int64,
+// 				description:  "bitmap of ignored signals",
+// 			},
+// 	"Sigcatch"  : label{
+//           		unit: int64,
+// 				description:  "bitmap of catched signals",
+// 			},
+// 	"Wchan"  : label{
+//           		unit: int64,
+// 				description:  "address where process went to sleep)",
+// 			},
+// 	"Nswap"  : label{
+//           		unit: int64,
+// 				description:  "(place holder)",
+// 			},
+// 	"Cnswap"  : label{
+//           		unit: int64,
+// 				description:  "(place holder)",
+// 			},
+// 	"ExitSignal"  : label{
+//           		unit: int,
+// 				description:  "signal to send to parent thread on exit",
+// 			},
+// 	"Processor" : label{
+//           		unit: int,
+// 				description:  " which CPU the task is scheduled on",
+// 			},
+// 	"RtPriority" : label{
+//           		unit: int64,
+// 				description:  "realtime priority",
+// 			},
+// 	"Policy" : label{
+//           		unit: int64,
+// 				description:  "scheduling policy (man sched_setscheduler)",
+// 			},
+// 	"DelayacctBlkioTicks": label{
+//           		unit: int64,
+// 				description:  "time spent waiting for block IO",
+// 			},
+// 	}
+
 
 //
 // stat.New creates a new /proc/<pid>/stat from a path.
