@@ -28,10 +28,12 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"path"
+	"strings"
 )
 
 //
-// Take a list of FileInfo from /proc listing and only return 
+// Take a list of FileInfo from /proc listing and only return
 // pid directories
 //
 func filterByPidDirectories(files []os.FileInfo) []int {
@@ -50,8 +52,8 @@ func filterByPidDirectories(files []os.FileInfo) []int {
 //
 // Load all processes from /proc
 //
-// If lazy = true, do not load ancillary information (/proc/<pid>/stat, 
-// /proc/<pid>/statm, etc) immediately - load it on demand 
+// If lazy = true, do not load ancillary information (/proc/<pid>/stat,
+// /proc/<pid>/statm, etc) immediately - load it on demand
 //
 func Processes(lazy bool) (map[int]*Process, error) {
 	processes := make(map[int]*Process)
@@ -81,7 +83,62 @@ func Processes(lazy bool) (map[int]*Process, error) {
 		go fetch(pid)
 	}
 
-	// 
+	//
+	// fetch all processes until we're done
+	//
+	for ;todo > 0; {
+		proc := <-done
+		todo--
+		if proc != nil {
+			processes[proc.Pid] = proc
+		}
+	}
+
+	return processes, nil
+}
+
+
+//
+// Load all processes from /proc
+//
+// If lazy = true, do not load ancillary information (/proc/<pid>/stat,
+// /proc/<pid>/statm, etc) immediately - load it on demand
+//
+func ChildProcesses( spid int, recurse int) ( map[int]*Process, error ) {
+	processes := make(map[int]*Process)
+	done := make(chan *Process)
+	files, err := ioutil.ReadFile(path.Join("/proc", strconv.Itoa(spid), "task", strconv.Itoa(spid), "children"))
+	if err != nil {
+		return nil, err
+	}
+
+	pids :=  strings.Fields(string(files))
+
+	fetch := func(pid int) {
+		proc, err := NewProcess(pid, false)
+		if err != nil {
+			// TODO: bubble errors up if requested
+			log.Println("Failure loading process pid: ", pid, err)
+			done <- nil
+		} else {
+			done <- proc
+		}
+	}
+
+	todo := len(pids)
+
+	// create a goroutine that asynchronously processes all /proc/<pid> entries
+	for _, str := range pids {
+		pid, err := strconv.Atoi(str)
+		if err != nil {
+			// TODO: bubble errors up if requested
+			log.Println("Failure loading process pid: ", pid, err)
+			done <- nil
+		}
+		go fetch(pid)
+	}
+
+	//
 	// fetch all processes until we're done
 	//
 	for ;todo > 0; {

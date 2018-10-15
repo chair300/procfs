@@ -52,8 +52,7 @@ type Process struct {
 	limits    *limits.Limits    // Per process rlimit settings from /proc/pid/limits - see Limits()
 	loginuid  *int              // Maybe loginuid from /proc/pid/loginuid - see Loginuid()
 	sessionid *int              // Maybe sessionid from /proc/pid/sessionid- see Sessionid()
-	Children  chan *Process
-
+	Children  map[int]*Process  // list of child processes
 }
 
 //
@@ -109,7 +108,7 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 		process.Loginuid()
 		process.Sessionid()
 	}
-	process.findChildren()
+	//process.findChildren()
 	return process, nil
 }
 
@@ -289,37 +288,64 @@ func (p *Process) readEnviron() {
 		}
 	}
 }
- func (p *Process) findChildren(){
-// 	p.Children = make(map[int32]*Process)
-	p.Children = make(chan *Process)
- 	buf, err := ioutil.ReadFile(path.Join(p.prefix,"task",strconv.Itoa(p.Pid),"children"))
- 	if err != nil {
+
+
+//
+// Load child processes from /proc/<pid>
+//
+// recurse sets the depth of recusive children we traverse
+//
+func (p *Process) GetRecursiveChildProcesses(  recurse int )  {
+	if recurse <=0 {
+		return
+	}
+	recurse--
+	processes := make(map[int]*Process)
+	done := make(chan *Process)
+	files, err := ioutil.ReadFile(path.Join("/proc", strconv.Itoa(p.Pid), "task", strconv.Itoa(p.Pid), "children"))
+	if err != nil {
 		return
 	}
 
+	pids :=  strings.Fields(string(files))
+
 	fetch := func(pid int) {
-		if err != nil {
-			return
-		}
 		proc, err := NewProcess(pid, false)
 		if err != nil {
 			// TODO: bubble errors up if requested
 			log.Println("Failure loading process pid: ", pid, err)
-			p.Children <- nil
+			done <- nil
 		} else {
-			p.Children <- proc
+			done <- proc
 		}
 	}
-	cpids := strings.Split(string(buf), " ")
 
-	for i := 0; i < len(cpids)-1; i++ {
-		id, err := strconv.Atoi(cpids[i])
-	 	if err != nil {
-	 		return
-	 	}
-		log.Println("PPid: ",p.Pid)
-	 	log.Println("Child pid of: ",id)
-		go fetch(id)
-	 }
+	todo := len(pids)
 
+	// create a goroutine that asynchronously processes all /proc/<pid> entries
+	for _, str := range pids {
+		pid, err := strconv.Atoi(str)
+		if err != nil {
+			// TODO: bubble errors up if requested
+			log.Println("Failure loading process pid: ", pid, err)
+			done <- nil
+		}
+		go fetch(pid)
+	}
+
+	//
+	// fetch all processes until we're done
+	//
+	for ;todo > 0; {
+		proc := <-done
+		todo--
+		if proc != nil {
+			log.Println("Logging new proc: ", proc.Pid)
+			processes[proc.Pid] = proc
+			proc.GetRecursiveChildProcesses(recurse)
+		}
+	}
+	p.Children = processes
+
+	return
 }
