@@ -1,12 +1,4 @@
 //
-// children.children describes data in /proc/<pid>/tasks/<pid>/children.
-//
-// Use statm.New() to create a new stat.Statm object
-// from data in a path.
-//
-package children
-
-//
 // Copyright Christopher Harrison (harrison@glsan.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -29,37 +21,33 @@ package children
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import (
-	"io/ioutil"
-	"strings"
-	"strconv"
-	"path"
-	"log"
+package children
 
+import (
+	"github.com/chair300/procfs/util"
+	"testing"
 )
 
 
-func New(prefix string, spid int64) ([]int64, error) {
-	pids := *int64
-	files, err := ioutil.ReadFile(path.Join(prefix, strconv.Itoa(spid), "task", strconv.Itoa(spid), "children"))
+
+func TestParsingStat(t *testing.T) {
+	// set the GLOBAL_SYSTEM_START
+	util.GLOBAL_SYSTEM_START = 1388417200
+	s, err := New("./testfiles", 38981)
+
 	if err != nil {
-		return nil, err
+		t.Fatal("Got error", err)
 	}
-	mpids :=  strings.Fields(string(files))
 
-	//todo := len(pids)
-
-	// create a goroutine that asynchronously processes all /proc/<pid> entries
-	for _, str := range mpids {
-		//pid, err := strconv.Atoi(str)
-		pid, err := strconv.ParseInt(str, 10, 64)
-		if err != nil {
-			// TODO: bubble errors up if requested
-			log.Println("Failure loading process pid: ", pid, err)
-			//done <- nil
-		}else{
-			pids[pid] = pid
-		}
+	if s == nil {
+		t.Fatal("children is missing")
 	}
-	return pids, err
+
+	// if s.Starttime.seconds() != 1388604586 {
+		// t.Fatal("Start time is wrong, expected: 1388604586", s.Starttime.EpochSeconds)
+	// }
+	if(s[39893] == nil){
+		t.Fatal("Does not contain the child proc id")
+	}
+
 }

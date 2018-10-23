@@ -16,36 +16,60 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package procfs
 
 import (
      "fmt"
+     "os"
+     "strconv"
 	"github.com/chair300/procfs"
-
 )
 
 
 func main() {
-
+     argsWithoutProg := os.Args[1:]
+     fmt.Println(argsWithoutProg)
      // fetch all processes from /proc
      // returns a map of pid -> *Process
-     procs, err := procfs.Processes(false);
+//     procs, err := procfs.Processes(false);
+     pid,err := strconv.Atoi(os.Args[1])
+     procs, err := procfs.NewProcess( pid, false)
      //fmt.Println(procs)
      if err != nil {}
-     //fmt.Println("processes", processes)
-     for k, v := range procs {
-          fmt.Println("pid:", k)
-          fmt.Println("Command:", v.Cmd)
-          s, err := v.Statm()
-          if err == nil {
-               fmt.Println("size:", s.Size)
-          }
-          //fmt.Println("size:", s.Size)
-	  for elem := range v.Children {
-		fmt.Println("Children", elem.Pid)
-    	  }
-	 fmt.Println("Children", v.Children)
+     k := procs.Pid
+     v := procs
+
+     fmt.Println("pid:", k)
+     fmt.Println("Command:", v.Cmd)
+     s, err := v.Statm()
+     if err == nil {
+          fmt.Println("size:", s.Size)
+     }
+     fmt.Println("size:", s.Size)
+     v.GetRecursiveChildProcesses(3)
+     //cproc := procfs.FindChildren( pid )
+     //cproc,err  := procfs.ChildProcesses(pid)
+     //fmt.Println("child array is: ",cproc)
+     // fetch := func(proc Process) {
+     //      if proc.Children == nil {
+     //           return
+     //      }
+
+	// }
+     // go fetch(v)
+     for  i,e := range v.Children {
+          fmt.Println("I cpid: ",i)
+          fmt.Println("E Children pid", e.Pid)
+          fmt.Println("E Command: ", e.Cmd)
+		for  q,w := range e.Children {
+			fmt.Println("W cpid: ",q)
+			fmt.Println("W Children pid", w.Pid)
+          	fmt.Println("W Command: ", w.Cmd)
+		}
 
      }
+//	 fmt.Println("Children", v.Children)
+
+     //}
      fmt.Println("hello")
 }
