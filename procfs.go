@@ -104,7 +104,7 @@ func Processes(lazy bool) (map[int]*Process, error) {
 // If lazy = true, do not load ancillary information (/proc/<pid>/stat,
 // /proc/<pid>/statm, etc) immediately - load it on demand
 //
-func ChildProcesses( spid int, recurse int) ( map[int]*Process, error ) {
+func ChildProcesses( spid int, recurse boolean) ( map[int]*Process, error ) {
 	processes := make(map[int]*Process)
 	done := make(chan *Process)
 	files, err := ioutil.ReadFile(path.Join("/proc", strconv.Itoa(spid), "task", strconv.Itoa(spid), "children"))

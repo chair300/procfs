@@ -1,12 +1,5 @@
-//
-// children.children describes data in /proc/<pid>/tasks/<pid>/children.
-//
-// Use statm.New() to create a new stat.Statm object
-// from data in a path.
-//
-package children
+package io
 
-//
 // Copyright Christopher Harrison (harrison@glsan.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -27,39 +20,38 @@ package children
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 import (
 	"io/ioutil"
-	"strings"
-	"strconv"
-	"path"
 	"log"
-
+	"strconv"
+	"strings"
 )
 
+//
+// io is a parser for /proc/<pid>/id.
+//
+//
+type IOinfo struct {
+	rchar      int64
+	wchar       int64
+	syscr       int64
+	syscw        int64
+	read_bytes    int64
+	write_bytes        int64
+	canclled_write_bytes      int64
+}
 
-func New(prefix string, spid int64) (*int64, error) {
-	pids = *int64
-	files, err := ioutil.ReadFile(path.Join(prefix, strconv.Itoa(spid), "task", strconv.Itoa(spid), "children"))
+
+func New(path string) (*IOinfo, error) {
+
+	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	mpids :=  strings.Fields(string(files))
 
-	//todo := len(pids)
-
-	// create a goroutine that asynchronously processes all /proc/<pid> entries
-	for _, str := range mpids {
-		//pid, err := strconv.Atoi(str)
-		pid, err := strconv.ParseInt(str, 10, 64)
-		if err != nil {
-			// TODO: bubble errors up if requested
-			log.Println("Failure loading process pid: ", pid, err)
-			//done <- nil
-		}else{
-			pids <- pid
-		}
-	}
-	return pids, err
+	lines := strings.Fields(string(buf))
+	io := &IOinfo{}
+	err = util.ParseStringsIntoStruct(io, lines)
+	return io, err
 }

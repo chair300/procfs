@@ -1,6 +1,6 @@
 package procfs
 
-// Copyright Jen Andre (chair300@gmail.com)
+// Copyright Jen Andre (jandre@gmail.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
