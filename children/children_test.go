@@ -30,7 +30,7 @@ import (
 
 
 
-func TestParsingStat(t *testing.T) {
+func TestParsingChildren(t *testing.T) {
 	// set the GLOBAL_SYSTEM_START
 	util.GLOBAL_SYSTEM_START = 1388417200
 	s, err := New("./testfiles", 38981)
@@ -46,8 +46,46 @@ func TestParsingStat(t *testing.T) {
 	// if s.Starttime.seconds() != 1388604586 {
 		// t.Fatal("Start time is wrong, expected: 1388604586", s.Starttime.EpochSeconds)
 	// }
-	if(s[39893] == nil){
+	t.Log(s)
+	var tobe bool = false
+	for _, b := range s {
+		if b == 39893 {
+			tobe = true;
+			t.Log("Contains 39893")
+		}
+	}
+	if !tobe {
 		t.Fatal("Does not contain the child proc id")
+	}
+
+}
+
+func BenchmarkParsingChildren(b *testing.B) {
+	// set the GLOBAL_SYSTEM_START
+	util.GLOBAL_SYSTEM_START = 1388417200
+	s, err := New("./testfiles", 38981)
+
+	if err != nil {
+		b.Fatal("Got error", err)
+	}
+
+	if s == nil {
+		b.Fatal("children is missing")
+	}
+
+	// if s.Starttime.seconds() != 1388604586 {
+		// t.Fatal("Start time is wrong, expected: 1388604586", s.Starttime.EpochSeconds)
+	// }
+
+	var tobe bool = false
+	for _, b := range s {
+		if b == 39893 {
+			tobe = true;
+			//b.Log("Contains 39893")
+		}
+	}
+	if !tobe {
+		b.Fatal("Does not contain the child proc id")
 	}
 
 }

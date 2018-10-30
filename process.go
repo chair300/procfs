@@ -32,6 +32,8 @@ import (
 	"github.com/chair300/procfs/stat"
 	"github.com/chair300/procfs/statm"
 	"github.com/chair300/procfs/status"
+	"github.com/chair300/procfs/children"
+	"github.com/chair300/procfs/procfsio"
 )
 
 //
@@ -50,9 +52,11 @@ type Process struct {
 	statm     *statm.Statm      // Memory Status information from /proc/pid/statm - see Statm()
 	status    *status.Status    //Status information from /proc/pid/status
 	limits    *limits.Limits    // Per process rlimit settings from /proc/pid/limits - see Limits()
+	io		*procfsio.ioInfo  // Per process io info
 	loginuid  *int              // Maybe loginuid from /proc/pid/loginuid - see Loginuid()
 	sessionid *int              // Maybe sessionid from /proc/pid/sessionid- see Sessionid()
-	Children  map[int]*Process  // list of child processes
+	Children  map[int]*Process  // list of child process
+	cpid		[]int	   // list of child procid
 }
 
 //
@@ -107,6 +111,7 @@ func NewProcessFromPath(pid int, prefix string, lazy bool) (*Process, error) {
 		process.Limits()
 		process.Loginuid()
 		process.Sessionid()
+		process.ChildrenIds()
 	}
 	//process.findChildren()
 	return process, nil
@@ -195,6 +200,23 @@ func (p *Process) Stat() (*stat.Stat, error) {
 }
 
 //
+// Parser for /proc/<pid>/stat
+//
+func (p *Process) ChildrenIds() ([]int, error) {
+	var err error
+	if p.cpid == nil {
+		p.cpid, err = children.New(p.prefix, p.Pid)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return p.cpid, nil
+}
+
+
+
+//
 // Parser for /proc/<pid>/statm
 //
 func (p *Process) Statm() (*statm.Statm, error) {
@@ -207,6 +229,22 @@ func (p *Process) Statm() (*statm.Statm, error) {
 
 	return p.statm, nil
 }
+
+
+//
+// Parser for /proc/<pid>/statm
+//
+func (p *Process) IO() (*procfsio.ioInfo, error) {
+	var err error
+	if p.io == nil {
+		if p.statm, err = procfsio.New(path.Join(p.prefix, "io")); err != nil {
+			return nil, err
+		}
+	}
+
+	return p.statm, nil
+}
+
 
 //
 // Parser for /proc/<pid>/status
@@ -275,6 +313,10 @@ func (p *Process) Sessionid() int {
 	return NO_VALUE
 }
 
+
+
+
+
 func (p *Process) readEnviron() {
 	p.Environ = make(map[string]string, 0)
 	bytes, err := ioutil.ReadFile(path.Join(p.prefix, "environ"))
@@ -295,57 +337,57 @@ func (p *Process) readEnviron() {
 //
 // recurse sets the depth of recusive children we traverse
 //
-func (p *Process) GetRecursiveChildProcesses(  recurse int )  {
-	if recurse <=0 {
-		return
-	}
-	recurse--
-	processes := make(map[int]*Process)
-	done := make(chan *Process)
-	files, err := ioutil.ReadFile(path.Join("/proc", strconv.Itoa(p.Pid), "task", strconv.Itoa(p.Pid), "children"))
-	if err != nil {
-		return
-	}
-
-	pids :=  strings.Fields(string(files))
-
-	fetch := func(pid int) {
-		proc, err := NewProcess(pid, false)
-		if err != nil {
-			// TODO: bubble errors up if requested
-			log.Println("Failure loading process pid: ", pid, err)
-			done <- nil
-		} else {
-			done <- proc
-		}
-	}
-
-	todo := len(pids)
-
-	// create a goroutine that asynchronously processes all /proc/<pid> entries
-	for _, str := range pids {
-		pid, err := strconv.Atoi(str)
-		if err != nil {
-			// TODO: bubble errors up if requested
-			log.Println("Failure loading process pid: ", pid, err)
-			done <- nil
-		}
-		go fetch(pid)
-	}
-
-	//
-	// fetch all processes until we're done
-	//
-	for ;todo > 0; {
-		proc := <-done
-		todo--
-		if proc != nil {
-			log.Println("Logging new proc: ", proc.Pid)
-			processes[proc.Pid] = proc
-			proc.GetRecursiveChildProcesses(recurse)
-		}
-	}
-	p.Children = processes
-
-	return
-}
+// func (p *Process) GetRecursiveChildProcesses(  recurse int )  {
+// 	if recurse <=0 {
+// 		return
+// 	}
+// 	recurse--
+// 	processes := make(map[int]*Process)
+// 	done := make(chan *Process)
+// 	files, err := ioutil.ReadFile(path.Join("/proc", strconv.Itoa(p.Pid), "task", strconv.Itoa(p.Pid), "children"))
+// 	if err != nil {
+// 		return
+// 	}
+//
+// 	pids :=  strings.Fields(string(files))
+//
+// 	fetch := func(pid int) {
+// 		proc, err := NewProcess(pid, false)
+// 		if err != nil {
+// 			// TODO: bubble errors up if requested
+// 			log.Println("Failure loading process pid: ", pid, err)
+// 			done <- nil
+// 		} else {
+// 			done <- proc
+// 		}
+// 	}
+//
+// 	todo := len(pids)
+//
+// 	// create a goroutine that asynchronously processes all /proc/<pid> entries
+// 	for _, str := range pids {
+// 		pid, err := strconv.Atoi(str)
+// 		if err != nil {
+// 			// TODO: bubble errors up if requested
+// 			log.Println("Failure loading process pid: ", pid, err)
+// 			done <- nil
+// 		}
+// 		go fetch(pid)
+// 	}
+//
+// 	//
+// 	// fetch all processes until we're done
+// 	//
+// 	for ;todo > 0; {
+// 		proc := <-done
+// 		todo--
+// 		if proc != nil {
+// 			log.Println("Logging new proc: ", proc.Pid)
+// 			processes[proc.Pid] = proc
+// 			proc.GetRecursiveChildProcesses(recurse)
+// 		}
+// 	}
+// 	p.Children = processes
+//
+// 	return
+// }

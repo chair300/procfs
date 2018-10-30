@@ -39,27 +39,22 @@ import (
 )
 
 
-func New(prefix string, spid int64) (*int64, error) {
-	pids = *int64
+func New(prefix string, spid int) (pids []int, err error) {
 	files, err := ioutil.ReadFile(path.Join(prefix, strconv.Itoa(spid), "task", strconv.Itoa(spid), "children"))
 	if err != nil {
 		return nil, err
 	}
 	mpids :=  strings.Fields(string(files))
-
-	//todo := len(pids)
-
-	// create a goroutine that asynchronously processes all /proc/<pid> entries
+	pids = make([]int, 0,len(mpids))
 	for _, str := range mpids {
-		//pid, err := strconv.Atoi(str)
-		pid, err := strconv.ParseInt(str, 10, 64)
+		if len(str) == 0 { continue }
+		pid, err := strconv.Atoi(str)
 		if err != nil {
-			// TODO: bubble errors up if requested
 			log.Println("Failure loading process pid: ", pid, err)
-			//done <- nil
-		}else{
-			pids <- pid
+			return nil, err
 		}
+		pids = append(pids,pid)
 	}
+	//log.Println(pids)
 	return pids, err
 }
