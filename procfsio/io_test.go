@@ -1,8 +1,10 @@
-package io
+package procfsio
 
 import (
 	"github.com/chair300/procfs/util"
+//	"strconv"
 	"testing"
+//	"log"
 )
 
 
@@ -18,9 +20,9 @@ func TestParsingIo(t *testing.T) {
 	if s == nil {
 		t.Fatal("stat is missing")
 	}
-
-	// if s.Starttime.seconds() != 1388604586 {
-		// t.Fatal("Start time is wrong, expected: 1388604586", s.Starttime.EpochSeconds)
-	// }
+	//log.Println("io is : ", s)
+	if s.rchar != 119010 {
+		t.Fatal("read char should be: 119010, instead",  s.rchar)
+	}
 
 }
