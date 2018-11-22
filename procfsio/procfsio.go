@@ -32,7 +32,7 @@ import (
 // io is a parser for /proc/<pid>/id.
 //
 //
-type procfsio struct {
+type Procfsio struct {
 	rchar      int64
 	wchar       int64
 	syscr       int64
@@ -43,14 +43,14 @@ type procfsio struct {
 }
 
 
-func New(path string) (*procfsio, error) {
+func New(path string) (*Procfsio, error) {
 
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 	lines := strings.Split(string(buf), "\n")
-	info := &procfsio{}
+	info := &Procfsio{}
 
 	for i := 0; i < len(lines); i++ {
 

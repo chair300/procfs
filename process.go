@@ -52,7 +52,7 @@ type Process struct {
 	statm     *statm.Statm      // Memory Status information from /proc/pid/statm - see Statm()
 	status    *status.Status    //Status information from /proc/pid/status
 	limits    *limits.Limits    // Per process rlimit settings from /proc/pid/limits - see Limits()
-	io		*procfsio.ioInfo  // Per process io info
+	io		*procfsio.Procfsio  // Per process io info
 	loginuid  *int              // Maybe loginuid from /proc/pid/loginuid - see Loginuid()
 	sessionid *int              // Maybe sessionid from /proc/pid/sessionid- see Sessionid()
 	Children  map[int]*Process  // list of child process
@@ -234,15 +234,15 @@ func (p *Process) Statm() (*statm.Statm, error) {
 //
 // Parser for /proc/<pid>/statm
 //
-func (p *Process) IO() (*procfsio.ioInfo, error) {
+func (p *Process) IO() (*procfsio.Procfsio, error) {
 	var err error
 	if p.io == nil {
-		if p.statm, err = procfsio.New(path.Join(p.prefix, "io")); err != nil {
+		if p.io, err = procfsio.New(path.Join(p.prefix, "io")); err != nil {
 			return nil, err
 		}
 	}
 
-	return p.statm, nil
+	return p.io, nil
 }
 
 
